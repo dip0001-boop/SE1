@@ -10,9 +10,12 @@
   <canvas id="viewport"></canvas>
   <div id="ui-root" class="ui-root">
     <div class="title">Singularity Engine 1</div>
-    <div class="subtitle">Runtime-only galaxy generator</div>
+    <div class="subtitle">Runtime galaxy generator — WASD to fly</div>
     <button id="genBtn">Generate Sector 0,0,0</button>
     <div id="status">idle</div>
+    <div style="margin-top:8px;font-size:11px;color:#9ca3af">
+      Controls: <strong>W A S D</strong> move, <strong>Q/E</strong> up/down.
+    </div>
   </div>
 
   <script type="module">
@@ -25,11 +28,16 @@
 
     btn?.addEventListener("click", async () => {
       status.textContent = "requesting backend...";
-      const res = await fetch("/api/galaxy/sector?sectorId=0,0,0");
-      const json = await res.json();
-      status.textContent = "generating...";
-      engine.galaxyManager.generateSector(json.seed, json.sectorId);
-      status.textContent = "done";
+      try {
+        const res = await fetch("/api/galaxy/sector?sectorId=0,0,0");
+        const json = await res.json();
+        status.textContent = "generating...";
+        engine.galaxyManager.generateSector(json.seed, json.sectorId);
+        status.textContent = "done";
+      } catch (err) {
+        status.textContent = "error";
+        console.error(err);
+      }
     });
   </script>
 </body>
