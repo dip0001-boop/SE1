@@ -3,4 +3,4 @@ services:
     name: singularity-engine-1
     env: node
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: npm run start
