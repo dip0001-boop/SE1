@@ -4,23 +4,22 @@ import { createSector } from "./Sector.js";
 import { createStar } from "./Star.js";
 import { createPlanet } from "./Planet.js";
 import { createNebula } from "./Nebula.js";
+import { xorshift32 } from "./RNG.js";
 
+/**
+ * GalaxySystem: pure generation logic using seeded RNG.
+ * Adds entities to ECS: Transform + Sector + Star/Planet/Nebula components.
+ */
 export class GalaxySystem extends System {
   update(_dt) {
-    // explicit generation only
+    // generation is explicit via generateSector
   }
 
   generateSector(seed, sectorId) {
-    let state = seed ^ hashString(sectorId);
+    const rand = xorshift32(seed);
+    // More stars: 200 - 1000
+    const starCount = 200 + Math.floor(rand() * 800);
 
-    function rand() {
-      state ^= state << 13;
-      state ^= state >>> 17;
-      state ^= state << 5;
-      return (state >>> 0) / 0xffffffff;
-    }
-
-    const starCount = 20 + Math.floor(rand() * 31);
     for (let i = 0; i < starCount; i++) {
       const ex = (rand() - 0.5) * 100;
       const ey = (rand() - 0.5) * 100;
@@ -39,6 +38,7 @@ export class GalaxySystem extends System {
       );
       this.ecs.addComponent(e, "Star", star);
 
+      // Planets
       const planetCount = Math.floor(rand() * 6);
       for (let p = 0; p < planetCount; p++) {
         const pe = this.ecs.createEntity();
@@ -63,6 +63,7 @@ export class GalaxySystem extends System {
       }
     }
 
+    // Nebula chance
     if (rand() < 0.15) {
       const ne = this.ecs.createEntity();
       const nx = (rand() - 0.5) * 200;
@@ -79,15 +80,6 @@ export class GalaxySystem extends System {
       this.ecs.addComponent(ne, "Nebula", neb);
     }
   }
-}
-
-function hashString(s) {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619) >>> 0;
-  }
-  return h >>> 0;
 }
 
 function pickSpectral(r) {
