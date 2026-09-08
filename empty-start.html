@@ -1,1 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Singularity Engine 1 — Empty Start</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <canvas id="viewport"></canvas>
+  <div id="ui-root" class="ui-root">Singularity Engine 1 — Empty Start (open console)</div>
 
+  <script type="module">
+    import { bootstrap } from "./Bootstrap.js";
+    const engine = bootstrap();
+    window.engine = engine;
+    // open console and call:
+    // engine.galaxyManager.generateSector(12345, "0,0,0");
+  </script>
+</body>
+</html>
