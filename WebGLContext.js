@@ -29,9 +29,10 @@ export class WebGLContext {
     in vec3 a_position;
     in vec3 a_color;
     out vec3 v_color;
+    uniform mat4 u_viewProjection;
     void main() {
       v_color = a_color;
-      gl_Position = vec4(a_position * 0.01, 1.0);
+      gl_Position = u_viewProjection * vec4(a_position, 1.0);
       gl_PointSize = 2.0;
     }`;
 
@@ -40,7 +41,10 @@ export class WebGLContext {
     in vec3 v_color;
     out vec4 outColor;
     void main() {
-      outColor = vec4(v_color, 1.0);
+      vec2 coord = gl_PointCoord - vec2(0.5);
+      float dist = length(coord);
+      float alpha = smoothstep(0.5, 0.0, dist);
+      outColor = vec4(v_color, alpha);
     }`;
 
     const vs = gl.createShader(gl.VERTEX_SHADER);
@@ -71,11 +75,13 @@ export class WebGLContext {
     const buffer = gl.createBuffer();
     const posLoc = gl.getAttribLocation(prog, "a_position");
     const colLoc = gl.getAttribLocation(prog, "a_color");
+    const viewProjLoc = gl.getUniformLocation(prog, "u_viewProjection");
 
     this.pointProgramInfo = {
       program: prog,
       buffer,
-      attribs: { position: posLoc, color: colLoc }
+      attribs: { position: posLoc, color: colLoc },
+      uniforms: { viewProjection: viewProjLoc }
     };
     return this.pointProgramInfo;
   }
