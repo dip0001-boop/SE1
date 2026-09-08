@@ -3,42 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Singularity Engine 1</title>
+  <title>Singularity Engine Editor</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <canvas id="viewport"></canvas>
-  <div id="ui-root" class="ui-root">
-    <div class="title">Singularity Engine 1</div>
-    <div class="subtitle">Runtime galaxy generator — WASD to fly</div>
-    <button id="genBtn">Generate Sector 0,0,0</button>
-    <div id="status">idle</div>
-    <div style="margin-top:8px;font-size:11px;color:#9ca3af">
-      Controls: <strong>W A S D</strong> move, <strong>Q/E</strong> up/down.
-    </div>
+  <div id="editor-root" class="editor-root">
+    <header class="topbar">
+      <div class="brand">Singularity Engine</div>
+      <div class="toolbar">
+        <button id="btn-play">Play</button>
+        <button id="btn-save">Save</button>
+        <button id="btn-load">Load</button>
+        <select id="gizmo-mode">
+          <option value="translate">Translate</option>
+          <option value="rotate">Rotate</option>
+          <option value="scale">Scale</option>
+        </select>
+      </div>
+    </header>
+
+    <aside class="leftpanel">
+      <div class="panel-title">Scene</div>
+      <div id="scene-tree" class="scene-tree"></div>
+    </aside>
+
+    <main class="viewport-panel">
+      <canvas id="viewport"></canvas>
+      <div class="viewport-overlay">
+        <div id="fps" class="fps">FPS: --</div>
+      </div>
+    </main>
+
+    <aside class="rightpanel">
+      <div class="panel-title">Inspector</div>
+      <div id="inspector" class="inspector"></div>
+    </aside>
   </div>
 
   <script type="module">
-    import { bootstrap } from "./Bootstrap.js";
-    const engine = bootstrap();
-    window.engine = engine;
-
-    const btn = document.getElementById("genBtn");
-    const status = document.getElementById("status");
-
-    btn?.addEventListener("click", async () => {
-      status.textContent = "requesting backend...";
-      try {
-        const res = await fetch("/api/galaxy/sector?sectorId=0,0,0");
-        const json = await res.json();
-        status.textContent = "generating...";
-        engine.galaxyManager.generateSector(json.seed, json.sectorId);
-        status.textContent = "done";
-      } catch (err) {
-        status.textContent = "error";
-        console.error(err);
-      }
-    });
+    import { bootstrapEditor } from "./editor.js";
+    bootstrapEditor();
   </script>
 </body>
 </html>
