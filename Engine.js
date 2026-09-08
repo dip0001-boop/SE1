@@ -5,6 +5,7 @@ import { Renderer } from "./Renderer.js";
 import { GalaxySystem } from "./GalaxySystem.js";
 import { GalaxyManager } from "./GalaxyManager.js";
 import { OrbitSystem } from "./OrbitSystem.js";
+import { ScriptHost } from "./ScriptHost.js";
 
 export class Engine {
   constructor(canvas) {
@@ -19,6 +20,11 @@ export class Engine {
     this.renderer = new Renderer(canvas, this.ecs);
     this.loop = new Loop((dt) => this.update(dt), () => this.render());
     this._pendingSectorRequests = new Set();
+
+    this.scriptHost = new ScriptHost(this.ecs, this.renderer);
+    this.scriptHost.exposeAPI();
+    this._scriptReady = false;
+    this.scriptHost.init().then((ok) => { this._scriptReady = ok; });
   }
 
   start() {
@@ -30,7 +36,6 @@ export class Engine {
   }
 
   async update(dt) {
-    // camera movement (WASD)
     if (this.input.keys.has("w")) this.renderer.camera.z -= 80 * dt;
     if (this.input.keys.has("s")) this.renderer.camera.z += 80 * dt;
     if (this.input.keys.has("a")) this.renderer.camera.x -= 80 * dt;
@@ -38,10 +43,8 @@ export class Engine {
     if (this.input.keys.has("q")) this.renderer.camera.y -= 80 * dt;
     if (this.input.keys.has("e")) this.renderer.camera.y += 80 * dt;
 
-    // update orbiting planets
     this.orbitSystem.update(dt);
 
-    // auto-generate sector under camera
     const sectorId = this.galaxyManager.sectorIdForPosition(
       this.renderer.camera.x,
       this.renderer.camera.y,
@@ -59,6 +62,10 @@ export class Engine {
       } finally {
         this._pendingSectorRequests.delete(sectorId);
       }
+    }
+
+    if (this._scriptReady) {
+      await this.scriptHost.update(dt);
     }
   }
 
