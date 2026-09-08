@@ -9,18 +9,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
 app.use("/api/galaxy", galaxyRouter);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Serve everything from root
 app.use(express.static(__dirname));
 
-app.get("*", (req, res) => {
+app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(PORT, () => {
-  console.log("Singularity Engine 1 backend running on port " + PORT);
+  console.log(`Singularity Engine 1 backend running on port ${PORT}`);
 });
