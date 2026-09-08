@@ -1,3 +1,4 @@
+// RenderSystem.js
 import { System } from "./System.js";
 
 export class RenderSystem extends System {
