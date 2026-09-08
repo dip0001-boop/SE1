@@ -1,5 +1,6 @@
 import { WebGLContext } from "./WebGLContext.js";
 import { RenderSystem } from "./RenderSystem.js";
+import { Camera } from "./Camera.js";
 
 export class Renderer {
   constructor(canvas, ecs) {
@@ -7,6 +8,7 @@ export class Renderer {
     this.ecs = ecs;
     this.glctx = new WebGLContext(canvas);
     this.renderSystem = new RenderSystem(this.ecs);
+    this.camera = new Camera();
   }
 
   render() {
@@ -57,6 +59,15 @@ export class Renderer {
       gl.vertexAttribPointer(colLoc, 3, gl.FLOAT, false, 24, 12);
     }
 
+    // compute viewProjection matrix
+    const aspect = gl.canvas.width / gl.canvas.height;
+    const proj = this.camera.projectionMatrix(aspect);
+    const view = this.camera.viewMatrix();
+    const viewProj = multiplyMatrices(proj, view);
+
+    const loc = progInfo.uniforms.viewProjection;
+    if (loc) gl.uniformMatrix4fv(loc, false, viewProj);
+
     gl.drawArrays(gl.POINTS, 0, stars.length);
 
     if (posLoc >= 0) gl.disableVertexAttribArray(posLoc);
@@ -64,4 +75,19 @@ export class Renderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.useProgram(null);
   }
+}
+
+// simple 4x4 multiply (col-major)
+function multiplyMatrices(a, b) {
+  const out = new Float32Array(16);
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      let sum = 0;
+      for (let k = 0; k < 4; k++) {
+        sum += a[k * 4 + j] * b[i * 4 + k];
+      }
+      out[i * 4 + j] = sum;
+    }
+  }
+  return out;
 }
