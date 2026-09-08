@@ -1,1 +1,11 @@
+<script type="module">
+  import { bootstrap } from "./Bootstrap.js";
+  const engine = bootstrap();
+  window.engine = engine;
 
+  document.getElementById("genBtn").onclick = async () => {
+    const res = await fetch("/api/galaxy/sector?sectorId=0,0,0");
+    const json = await res.json();
+    engine.galaxyManager.generateSector(json.seed, json.sectorId);
+  };
+</script>
