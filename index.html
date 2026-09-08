@@ -1,11 +1,36 @@
-<script type="module">
-  import { bootstrap } from "./Bootstrap.js";
-  const engine = bootstrap();
-  window.engine = engine;
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Singularity Engine 1</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <canvas id="viewport"></canvas>
+  <div id="ui-root" class="ui-root">
+    <div class="title">Singularity Engine 1</div>
+    <div class="subtitle">Runtime-only galaxy generator</div>
+    <button id="genBtn">Generate Sector 0,0,0</button>
+    <div id="status">idle</div>
+  </div>
 
-  document.getElementById("genBtn").onclick = async () => {
-    const res = await fetch("/api/galaxy/sector?sectorId=0,0,0");
-    const json = await res.json();
-    engine.galaxyManager.generateSector(json.seed, json.sectorId);
-  };
-</script>
+  <script type="module">
+    import { bootstrap } from "./Bootstrap.js";
+    const engine = bootstrap();
+    window.engine = engine;
+
+    const btn = document.getElementById("genBtn");
+    const status = document.getElementById("status");
+
+    btn?.addEventListener("click", async () => {
+      status.textContent = "requesting backend...";
+      const res = await fetch("/api/galaxy/sector?sectorId=0,0,0");
+      const json = await res.json();
+      status.textContent = "generating...";
+      engine.galaxyManager.generateSector(json.seed, json.sectorId);
+      status.textContent = "done";
+    });
+  </script>
+</body>
+</html>
