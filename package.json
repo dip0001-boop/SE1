@@ -1,1 +1,13 @@
-
+{
+  "name": "singularity-engine-1",
+  "version": "0.1.0",
+  "description": "Singularity Engine 1 — runtime-only galaxy generator",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "cors": "^2.8.5"
+  }
+}
