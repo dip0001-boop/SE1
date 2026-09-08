@@ -1,1 +1,6 @@
-
+services:
+  - type: web
+    name: singularity-engine-1
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
