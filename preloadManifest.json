@@ -1,0 +1,13 @@
+{
+  "assets": [
+    "nebula.frag",
+    "nebula.vert",
+    "star.vert",
+    "star.frag",
+    "noise.png",
+    "wasm_rust_bg.wasm",
+    "wasm_cpp.wasm",
+    "dotnet.wasm",
+    "dotnet.js"
+  ]
+}
